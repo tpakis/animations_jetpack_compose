@@ -38,7 +38,9 @@ fun TimerScreen(viewModel: MainViewModel) {
 
 @Composable
 fun ControlRow() {
-    Row {
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .fillMaxHeight(),verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.Center) {
         FloatingActionButton(onClick = { /*do something*/ }) {
             Icon(Icons.Filled.PlayArrow, contentDescription = "Start timer")
         }
