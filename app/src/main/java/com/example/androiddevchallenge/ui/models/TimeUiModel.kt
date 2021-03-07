@@ -1,6 +1,6 @@
 package com.example.androiddevchallenge.ui.models
 
-class Time(totalSeconds: Int) {
+class TimeUiModel(val totalSeconds: Int) {
     init {
         require(totalSeconds in (0..3599))
     }

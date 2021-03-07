@@ -1,7 +1,7 @@
 package com.example.androiddevchallenge.ui.models
 
-sealed class TimerState {
-    class Initial(val timeToStart: Time): TimerState()
-    class Started(val timeRemaining: Time): TimerState()
-    object Finished: TimerState()
+sealed class TimerState(val time: TimeUiModel) {
+    class Initial(val timeToStart: TimeUiModel): TimerState(timeToStart)
+    class Started(val timeRemaining: TimeUiModel): TimerState(timeRemaining)
+    object Finished: TimerState(TimeUiModel(0))
 }
