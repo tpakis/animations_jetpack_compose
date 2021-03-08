@@ -24,111 +24,45 @@ import com.example.androiddevchallenge.ui.models.TimerState
 
 @Composable
 fun TimerScreen(viewModel: MainViewModel) {
-    val timerState = viewModel.timerStateFlow.collectAsState().value
     Scaffold(
         content = {
-            when (timerState) {
-                is TimerState.Initial -> {
-                    Text(
-                        text = "Click to digits to change the time",
-                        color = Color.White,
-                        textAlign = TextAlign.Center,
-                        fontSize = 24.sp,
-                        modifier = Modifier.padding(vertical = 16.dp)
-                    )
-                    DigitsRow(timerState.timeToStart, viewModel)
-                    ControlRowInitial(viewModel)
-                }
-                is TimerState.Started -> {
-                    DigitsRow(timerState.timeRemaining, viewModel)
-                    ControlRowStarted(viewModel)
-                }
-                else -> {
-                    Text(
-                        text = "Finished!",
-                        color = Color.White,
-                        textAlign = TextAlign.Center,
-                        fontSize = 24.sp,
-                        modifier = Modifier.padding(vertical = 16.dp)
-                    )
-                    ControlRowFinished(viewModel)
-                }
+            Column(
+                modifier = Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                Header(viewModel)
+                DigitsRow(viewModel)
+                ControlRow(viewModel)
             }
         }
     )
 }
 
 @Composable
-fun ControlRowInitial(viewModel: MainViewModel) {
-    Row(
+fun Header(viewModel: MainViewModel) {
+    val state = viewModel.timerStateFlow.collectAsState().value
+
+    Text(
+        text = when (state) {
+            is TimerState.Initial -> "Click digits to change the time"
+            is TimerState.Finished -> "Finished!"
+            else -> ""
+        },
+        color = Color.White,
+        textAlign = TextAlign.Center,
+        fontSize = 24.sp,
         modifier = Modifier
+            .padding(vertical = 16.dp)
             .fillMaxWidth()
-            .fillMaxHeight()
-            .padding(vertical = 20.dp),
-        verticalAlignment = Alignment.Bottom,
-        horizontalArrangement = Arrangement.Center
-    ) {
-        FloatingActionButton(
-            onClick = { viewModel.startCountDownClicked() },
-            backgroundColor = Color.Green
-        ) {
-            Icon(Icons.Filled.PlayArrow, contentDescription = "Start timer")
-        }
-        Spacer(modifier = Modifier.width(16.dp))
-        FloatingActionButton(
-            onClick = { viewModel.resetTimerClicked() },
-            backgroundColor = Color.Yellow
-        ) {
-            Icon(Icons.Filled.Restore, contentDescription = "Reset timer")
-        }
-    }
+    )
 }
 
 @Composable
-fun ControlRowStarted(viewModel: MainViewModel) {
+fun DigitsRow(viewModel: MainViewModel) {
+    val time = viewModel.timerStateFlow.collectAsState().value.time
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .padding(vertical = 20.dp),
-        verticalAlignment = Alignment.Bottom,
-        horizontalArrangement = Arrangement.Center
-    ) {
-        FloatingActionButton(
-            onClick = { viewModel.stopCountDownClicked() },
-            backgroundColor = Color.Red
-        ) {
-            Icon(Icons.Filled.Stop, contentDescription = "Stop timer")
-        }
-    }
-}
-
-@Composable
-fun ControlRowFinished(viewModel: MainViewModel) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .padding(vertical = 20.dp),
-        verticalAlignment = Alignment.Bottom,
-        horizontalArrangement = Arrangement.Center
-    ) {
-        FloatingActionButton(
-            onClick = { viewModel.resetTimerClicked() },
-            backgroundColor = Color.Yellow
-        ) {
-            Icon(Icons.Filled.Restore, contentDescription = "Reset timer")
-        }
-    }
-}
-
-@Composable
-fun DigitsRow(time: TimeUiModel, viewModel: MainViewModel) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(),
-        verticalAlignment = Alignment.CenterVertically,
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ) {
         Digit(time.tensOfMinutes) { viewModel.tensOfMinutesClicked() }
@@ -137,10 +71,56 @@ fun DigitsRow(time: TimeUiModel, viewModel: MainViewModel) {
             text = ":",
             color = Color.White,
             fontSize = 48.sp,
-            modifier = Modifier.padding(PaddingValues(bottom = 12.dp))
+            modifier = Modifier.padding(PaddingValues(top = 24.dp))
         )
 
         Digit(time.tensOfSeconds) { viewModel.tensOfSecondsClicked() }
         Digit(time.seconds) { viewModel.secondsClicked() }
+    }
+}
+
+@Composable
+fun ControlRow(viewModel: MainViewModel) {
+    val state = viewModel.timerStateFlow.collectAsState().value
+
+    Row(
+        modifier = Modifier
+            .padding(vertical = 20.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        when (state) {
+            is TimerState.Initial -> {
+                FloatingActionButton(
+                    onClick = { viewModel.startCountDownClicked() },
+                    backgroundColor = Color.Green
+                ) {
+                    Icon(Icons.Filled.PlayArrow, contentDescription = "Start timer")
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                FloatingActionButton(
+                    onClick = { viewModel.resetTimerClicked() },
+                    backgroundColor = Color.Yellow
+                ) {
+                    Icon(Icons.Filled.Restore, contentDescription = "Reset timer")
+                }
+            }
+            is TimerState.Started -> {
+                FloatingActionButton(
+                    onClick = { viewModel.stopCountDownClicked() },
+                    backgroundColor = Color.Red
+                ) {
+                    Icon(Icons.Filled.Stop, contentDescription = "Stop timer")
+                }
+            }
+            is TimerState.Finished -> {
+                FloatingActionButton(
+                    onClick = { viewModel.resetTimerClicked() },
+                    backgroundColor = Color.Yellow
+                ) {
+                    Icon(Icons.Filled.Restore, contentDescription = "Reset timer")
+                }
+            }
+        }
     }
 }
